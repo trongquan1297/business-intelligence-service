@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environments
+venv/
+env/
+*.env
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.komodoproject
+.komodotools/
+.eclim/
+*.classpath
+*.project
+*.settings/
+*.pydevproject
+
+# Testing
+*.pytest_cache/
+*.coverage
+htmlcov/
+
+# Translations
+*.mo
+
+# Documentation
+docs/_build/
+
+# Miscellaneous
+*.bak
+*.swp
+*.tmp
+*~
