@@ -1,8 +1,16 @@
 from fastapi import FastAPI
 from app.routers import auth, chat, database_metadata, chart, dataset, dashboard
 from app.dependencies import init_clients
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="AI Chat API", description="API for AI-powered chat and analytics")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # React/Next.js dev URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 async def startup_event():

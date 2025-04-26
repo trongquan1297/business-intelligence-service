@@ -14,12 +14,13 @@ async def create_chart(chart: ChartCreate, current_user: str = Depends(get_curre
     Create a new chart with name, query, and config.
     Requires JWT authentication and chart details in the request body.
     """
-    chart_id = ChartModel.create_chart(chart.dict())
-    chart_data = ChartModel.get_chart(chart_id)
+    chart_id = ChartModel.create_chart(chart.dict(), current_user)
+    chart_data = ChartModel.get_chart(chart_id, current_user)
     return {
         "id": chart_id,
         "name": chart.name,
         "schema_name": chart_data["schema_name"],
+        "owner": chart_data["owner"],
         "message": "Chart created successfully"
     }
 
@@ -37,6 +38,7 @@ async def update_chart(chart_id: int, chart: ChartUpdate, current_user: str = De
         "id": chart_id,
         "name": chart_data["name"],
         "schema_name": chart_data["schema_name"],
+        "owner": current_user,
         "message": "Chart updated successfully"
     }
 
@@ -46,7 +48,7 @@ async def delete_chart(chart_id: int, current_user: str = Depends(get_current_us
     Delete a chart by ID.
     Requires JWT authentication.
     """
-    chart_data = ChartModel.get_chart(chart_id)
+    chart_data = ChartModel.get_chart(chart_id, current_user)
     if not chart_data:
         raise HTTPException(status_code=404, detail="Chart not found")
     success = ChartModel.delete_chart(chart_id)
@@ -56,6 +58,7 @@ async def delete_chart(chart_id: int, current_user: str = Depends(get_current_us
         "id": chart_id,
         "name": chart_data["name"],
         "schema_name": chart_data["schema_name"],
+        "owner": chart_data["owner"],
         "message": "Chart deleted successfully"
     }
 
@@ -65,7 +68,7 @@ async def get_charts(current_user: str = Depends(get_current_user)):
     Retrieve a list of all charts with schema_name.
     Requires JWT authentication.
     """
-    charts = ChartModel.get_all_charts()
+    charts = ChartModel.get_all_charts(current_user)
     return {"charts": charts}
 
 
@@ -75,10 +78,10 @@ async def get_chart_data(chart_id: int, current_user: str = Depends(get_current_
     Retrieve a chart and its data for Chart.js rendering with schema_name.
     Requires JWT authentication.
     """
-    chart = ChartModel.get_chart(chart_id)
+    chart = ChartModel.get_chart(chart_id, current_user)
     if not chart:
         raise HTTPException(status_code=404, detail="Chart not found")
-    data = ChartModel.get_chart_data(chart_id, REDSHIFT_CONFIG)
+    data = ChartModel.get_chart_data(chart_id, REDSHIFT_CONFIG, current_user)
     return {
         "chart": chart,
         "data": data
