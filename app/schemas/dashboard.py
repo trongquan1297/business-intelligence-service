@@ -1,7 +1,7 @@
 from pydantic import BaseModel, validator
 from typing import Optional, Dict, List
 from datetime import datetime
-
+from app.schemas.comment import Comment
 class LayoutItem(BaseModel):
     i: str
     x: int
@@ -83,6 +83,8 @@ class Dashboard(BaseModel):
     layout: List[LayoutItem]
     owner: str
     description: Optional[str] = None
+    shared_users: List[str] = []
+    comments: List[Comment] = []
     created_at: datetime
     updated_at: datetime
 
@@ -99,5 +101,36 @@ class DashboardResponse(BaseModel):
     layout: List[LayoutItem]
     message: str
 
+class DashboardDataResponse(BaseModel):
+    id: int
+    name: str
+    owner: str
+    description: Optional[str] = None
+    layout: List[LayoutItem]
+    comments: List[Comment] = []
+    message: str
 class DashboardListResponse(BaseModel):
     dashboards: List[Dashboard]
+
+
+class ShareRequest(BaseModel):
+    shared_with: str
+
+    @validator('shared_with')
+    def validate_shared_with(cls, v):
+        if not v.strip():
+            raise ValueError("Shared_with username cannot be empty")
+        return v.strip()
+
+class ShareResponse(BaseModel):
+    resource_type: str
+    resource_id: int
+    shared_with: str
+    shared_by: str
+    message: str
+
+class SharedUsersResponse(BaseModel):
+    resource_type: str
+    resource_id: int
+    shared_users: List[str]
+

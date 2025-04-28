@@ -122,7 +122,6 @@ class ChartCreate(BaseModel):
     name: str
     query: ChartQuery
     config: ChartConfig
-    who_is_access: Optional[List[str]] = None
 
     @validator('name')
     def validate_name(cls, v):
@@ -130,20 +129,10 @@ class ChartCreate(BaseModel):
             raise ValueError("Chart name cannot be empty")
         return v.strip()
 
-    @validator('who_is_access')
-    def validate_who_is_access(cls, v):
-        if v is not None:
-            for user in v:
-                if not user.strip():
-                    raise ValueError("User or role in who_is_access cannot be empty")
-            return [user.strip() for user in v]
-        return v
-
 class ChartUpdate(BaseModel):
     name: Optional[str] = None
     query: Optional[ChartQuery] = None
     config: Optional[ChartConfig] = None
-    who_is_access: Optional[List[str]] = None
 
     @validator('name')
     def validate_name(cls, v):
@@ -151,24 +140,14 @@ class ChartUpdate(BaseModel):
             raise ValueError("Chart name cannot be empty")
         return v.strip() if v else v
 
-    @validator('who_is_access')
-    def validate_who_is_access(cls, v):
-        if v is not None:
-            for user in v:
-                if not user.strip():
-                    raise ValueError("User or role in who_is_access cannot be empty")
-            return [user.strip() for user in v]
-        return v
-
 class Chart(BaseModel):
     id: int
     name: str
     dataset_id: int
-    schema_name: str
     query: Dict
     config: Dict
     owner: str
-    who_is_access: List[str] = []
+    shared_users: List[str] = []
     created_at: datetime
     updated_at: datetime
 
@@ -180,7 +159,7 @@ class Chart(BaseModel):
 class ChartResponse(BaseModel):
     id: int
     name: str
-    schema_name: str
+    dataset_id: int
     owner: str
     message: str
 
